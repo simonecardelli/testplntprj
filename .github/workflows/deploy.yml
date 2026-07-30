@@ -18,9 +18,6 @@ jobs:
       - name: Trasferimento ed Esecuzione Deploy Atomico via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             TAG=${GITHUB_REF#refs/tags/}
             RELEASE_DIR="/var/www/releases/$TAG"
