@@ -22,8 +22,8 @@ jobs:
           VERSION="${GITHUB_REF_NAME}"
 
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "RELEASE_DIR=/var/www/myapp/releases/$VERSION" >> "$GITHUB_ENV"
-          echo "DEPLOY_DIR=/var/www/myapp" >> "$GITHUB_ENV"
+          echo "RELEASE_DIR=/tmp/www/myapp/releases/$VERSION" >> "$GITHUB_ENV"
+          echo "DEPLOY_DIR=/tmp/www/myapp" >> "$GITHUB_ENV"
       
       # Crea il tar della versione
       - name: Create archive
