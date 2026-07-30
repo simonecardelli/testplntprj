@@ -3,7 +3,7 @@ name: Deploy On-Premise Transazionale
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 jobs:
   deploy:
@@ -15,20 +15,69 @@ jobs:
       - name: Packaging dell'Artefatto
         run: tar -czf /tmp/release.tar.gz --exclude='.git' .
       
-      - name: Trasferimento ed Esecuzione Deploy Atomico via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          script: |
-            TAG=${GITHUB_REF#refs/tags/}
-            RELEASE_DIR="/var/www/releases/$TAG"
-            echo "Trasferimento ed Esecuzione Deploy Atomico via SSH: $TAG $RELEASE_DIR" 
+      # Definizione delle variabili
+      - name: Set deploy variables
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_DIR=/var/www/myapp/releases/$VERSION" >> "$GITHUB_ENV"
+          echo "DEPLOY_DIR=/var/www/myapp" >> "$GITHUB_ENV"
       
-      - name: Rollback Automatico in caso di errore
-        if: failure()
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            echo "⚠️ Deploy fallito! Ripristino versione precedente..."
+      # Crea il tar della versione
+      - name: Create archive
+        shell: bash
+        run: |
+          set -e
+
+          echo "Creating archive for $VERSION"
+
+          git archive \
+            --format=tar.gz \
+            --output="/tmp/myapp-${VERSION}.tar.gz" \
+            "$GITHUB_SHA"
+
+          ls -lh "/tmp/myapp-${VERSION}.tar.gz"
+
+      # Prepara la directory della release
+      - name: Prepare release directory
+        shell: bash
+        run: |
+          set -e
+
+          echo "Preparing $RELEASE_DIR"
+
+          mkdir -p "$RELEASE_DIR"
+
+          tar \
+            -xzf "/tmp/myapp-${VERSION}.tar.gz" \
+            -C "$RELEASE_DIR"
+      
+      # Aggiorna il symlink solo se tutto è OK
+      - name: Activate release
+        shell: bash
+        run: |
+          set -e
+
+          CURRENT_LINK="$DEPLOY_DIR/current"
+          TEMP_LINK="$DEPLOY_DIR/.current_tmp"
+
+          echo "Activating $VERSION"
+
+          rm -f "$TEMP_LINK"
+
+          ln -s "$RELEASE_DIR" "$TEMP_LINK"
+
+          # Rename atomico del symlink
+          mv -Tf "$TEMP_LINK" "$CURRENT_LINK"
+
+          echo "Current release:"
+          readlink -f "$CURRENT_LINK"
+
+      # Pulizia
+      - name: Cleanup
+        if: always()
+        shell: bash
+        run: |
+          rm -f "/tmp/myapp-${VERSION}.tar.gz"
