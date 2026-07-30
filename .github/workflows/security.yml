@@ -1,5 +1,6 @@
 name: Security Gates
-on: [pull_request]
+on:
+  push:
 
 jobs:
   secret-scan:
