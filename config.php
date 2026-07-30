@@ -1,7 +1,11 @@
 <?php
 
-$databaseHost = '127.0.0.1';
-$databaseUser = 'planet';
-$databasePassword = 'SuperSecretPassword123!';
+$dbPassword = 'MyDatabasePassword123!';
+$apiKey = 'sk_test_51N3xampleFakeKey';
+$vaultToken = 'hvs.fake-test-token-123456';
+$sshPassword = 'TestPassword!2026';
 
-echo "Database: {$databaseHost}\n";
+echo "dbPassword: {$dbPassword}\n";
+echo "apiKey: {$apiKey}\n";
+echo "vaultToken: {$vaultToken}\n";
+echo "sshPassword: {$sshPassword}\n";
