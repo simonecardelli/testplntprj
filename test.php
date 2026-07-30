@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $vaultAddr = getenv('VAULT_ADDR');
 $vaultToken = getenv('VAULT_DEV_ROOT_TOKEN_ID');
-$a="";
+$secret = "gfdgsdfg978fdgdfiug0dfn08";
 $vaultAddr = "http://host.docker.internal:8200";
 
 print_r($vaultAddr);
