@@ -1,0 +1,11 @@
+{
+    "name": "test/php-build",
+    "description": "Simple build test",
+    "type": "project",
+    "require": {
+        "php": "^8.1"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
