@@ -20,3 +20,20 @@ jobs:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, xml, ctype, iconv
       
+      - name: Run PHPUnit Tests
+        run: vendor/bin/phpunit --log-junit build/reports/phpunit-junit.xml
+      
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always() # Viene eseguito anche se i test precedenti falliscono!
+        with:
+          name: .NET Test Report
+          path: '**/test-results.trx'
+          reporter: dotnet-trx
+      
+      - name: Cobertura Report
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: '**/coverage.xml'
+          minimum_coverage: 20
+          fail_below_min: true
